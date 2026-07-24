@@ -1,0 +1,10 @@
+node_modules
+.env
+.DS_Store
+
+# frontend
+frontend/node_modules
+
+# backend
+backend/node_modules
+backend/db.json
