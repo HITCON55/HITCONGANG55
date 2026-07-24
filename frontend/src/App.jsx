@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import ReportForm from './components/ReportForm'
 import Dashboard from './components/Dashboard'
+import './app.css'
 
 export default function App() {
   const [problems, setProblems] = useState([])
@@ -20,21 +21,21 @@ export default function App() {
   }, [])
 
   const handleNewReport = (problem) => {
-    // Prepend so the newest appears first
     setProblems(prev => [problem, ...prev])
   }
 
   return (
     <div className="container">
+      <div className='mains'>
       <h1>Smart Community Problem Solver</h1>
       <div className="columns">
         <div className="left">
           <ReportForm onReportCreated={handleNewReport} />
-          <h1>Hello World</h1>
         </div>
         <div className="right">
           <Dashboard problems={problems} />
         </div>
+      </div>
       </div>
     </div>
   )
