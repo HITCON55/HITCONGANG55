@@ -30,6 +30,7 @@ export default function App() {
       <div className="columns">
         <div className="left">
           <ReportForm onReportCreated={handleNewReport} />
+          <h1>Hello World</h1>
         </div>
         <div className="right">
           <Dashboard problems={problems} />
