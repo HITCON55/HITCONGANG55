@@ -1,0 +1,101 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Smart Community Problem Solver — Demo</title>
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>Smart Community Problem Solver — Demo</h1>
+
+      <section class="card">
+        <h2>Submit a problem</h2>
+        <form id="reportForm">
+          <input id="title" placeholder="Title (e.g., Broken streetlight)" />
+          <textarea id="description" placeholder="Description"></textarea>
+          <input id="location" placeholder="Location (optional)" />
+          <button type="submit">Submit</button>
+        </form>
+        <div id="message" class="message" aria-live="polite"></div>
+      </section>
+
+      <section class="card">
+        <h2>Reported problems</h2>
+        <div id="list">Loading...</div>
+      </section>
+    </div>
+
+    <script>
+      async function fetchReports() {
+        const listEl = document.getElementById('list');
+        listEl.textContent = 'Loading...';
+        try {
+          const res = await fetch('/api/reports');
+          const data = await res.json();
+          if (!Array.isArray(data) || data.length === 0) {
+            listEl.innerHTML = '<div>No reports yet.</div>';
+            return;
+          }
+          const html = data.map(r => {
+            return `
+              <div class="report">
+                <strong>${escapeHtml(r.title)}</strong> — <em>${escapeHtml(r.category || 'Uncategorized')}</em>
+                <div>${escapeHtml(r.description)}</div>
+                <div class="meta">${r.location ? 'Location: ' + escapeHtml(r.location) + ' · ' : ''}Status: ${escapeHtml(r.status)}</div>
+              </div>
+            `;
+          }).join('');
+          listEl.innerHTML = html;
+        } catch (err) {
+          console.error(err);
+          listEl.textContent = 'Could not load reports.';
+        }
+      }
+
+      function escapeHtml(text) {
+        if (!text) return '';
+        return text
+          .replaceAll('&', '&amp;')
+          .replaceAll('<', '&lt;')
+          .replaceAll('>', '&gt;')
+          .replaceAll('"', '&quot;')
+          .replaceAll("'", '&#39;');
+      }
+
+      document.getElementById('reportForm').addEventListener('submit', async function (e) {
+        e.preventDefault();
+        const title = document.getElementById('title').value.trim();
+        const description = document.getElementById('description').value.trim();
+        const location = document.getElementById('location').value.trim();
+        const msgEl = document.getElementById('message');
+        msgEl.textContent = '';
+        if (!title || !description) {
+          alert('Please add a title and description.');
+          return;
+        }
+        try {
+          const res = await fetch('/api/reports', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ title, description, location })
+          });
+          if (!res.ok) throw new Error('Submit failed');
+          const saved = await res.json();
+          msgEl.textContent = 'Report submitted!';
+          document.getElementById('title').value = '';
+          document.getElementById('description').value = '';
+          document.getElementById('location').value = '';
+          fetchReports();
+        } catch (err) {
+          console.error(err);
+          msgEl.textContent = 'Failed to submit report.';
+        }
+      });
+
+      // initial load
+      fetchReports();
+    </script>
+  </body>
+</html>
