@@ -1,7 +1,9 @@
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import React, { Suspense } from 'react';
+import { motion, useScroll, useTransform } from 'framer-motion';
 import Icon from '../components/Icon.jsx';
 import AnimatedNumber from '../components/AnimatedNumber.jsx';
+import HeroCanvas from '../components/HeroCanvas.jsx';
 import SectionReveal from '../components/SectionReveal.jsx';
 
 const heroVariants = {
@@ -10,92 +12,72 @@ const heroVariants = {
 };
 
 function HomePage() {
+  const { scrollY } = useScroll();
+  const bgY = useTransform(scrollY, [0, 800], [0, -80]);
+  const midY = useTransform(scrollY, [0, 800], [0, -40]);
+  const fgY = useTransform(scrollY, [0, 800], [0, -18]);
+
   return (
-    <section className="section hero-section">
-      <div className="container hero-panel">
+    <section className="section hero-section hero-fullscreen">
+      <div className="hero-layers">
+        <motion.div className="hero-layer hero-layer--bg" style={{ y: bgY }} aria-hidden />
+        <motion.div className="hero-layer hero-layer--mid" style={{ y: midY }} aria-hidden />
+        <motion.div className="hero-layer hero-layer--fg" style={{ y: fgY }} aria-hidden />
+      </div>
+
+      <div className="container hero-panel hero-panel--cinematic">
         <div className="hero-grid">
           <div className="hero-copy">
             <motion.span className="hero-eyebrow" initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.1 }}>
               Civic reporting for better neighborhoods
             </motion.span>
-            <motion.h1 className="hero-title" initial={{ opacity: 0, y: 48 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}>
-              Together, we turn reports into safer streets.
+
+            <motion.h1 className="hero-title hero-title--cinematic" initial={{ opacity: 0, y: 48 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}>
+              Together, We Can Fix Our Community
             </motion.h1>
+
             <motion.p className="hero-description" initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.85, delay: 0.35 }}>
-              Smart Community helps citizens submit infrastructure issues quickly, track updates,
-              and keep neighborhoods informed with premium civic transparency.
+              Report issues, track progress, and see community impact — with clarity and speed.
             </motion.p>
 
             <motion.div className="hero-actions" initial={{ opacity: 0, y: 32 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.85, delay: 0.45 }}>
-              <Link to="/report" className="button">
+              <Link to="/report" className="button button--large">
                 Report a problem
               </Link>
-              <Link to="/issues" className="button button--secondary">
+              <Link to="/issues" className="button button--ghost button--large">
                 Explore issues
               </Link>
             </motion.div>
-
-            <div className="feature-grid">
-              {[
-                {
-                  title: 'Location-aware reporting',
-                  description: 'Capture issue details with coordinates, photos, and context for faster response.',
-                  icon: 'location',
-                },
-                {
-                  title: 'Actionable community metrics',
-                  description: 'See report flows, status breakdowns, and live neighborhood engagement at a glance.',
-                  icon: 'dashboard',
-                },
-                {
-                  title: 'Trusted civic collaboration',
-                  description: 'Enable residents and local staff to work together on resilient, well-maintained places.',
-                  icon: 'support',
-                },
-              ].map((feature, index) => (
-                <motion.div
-                  key={feature.title}
-                  className="feature-card"
-                  initial={{ opacity: 0, y: 40 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, amount: 0.25 }}
-                  transition={{ duration: 0.8, delay: 0.5 + index * 0.1 }}
-                >
-                  <div className="feature-card__icon">
-                    <Icon name={feature.icon} />
-                  </div>
-                  <h3>{feature.title}</h3>
-                  <p>{feature.description}</p>
-                </motion.div>
-              ))}
-            </div>
           </div>
 
-          <motion.div className="hero-preview-card card"
-            initial={{ opacity: 0, y: 36, scale: 0.98 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            transition={{ duration: 0.95, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
-          >
-            <span className="hero-preview-tag">Live issue tracker</span>
-            <motion.div className="hero-preview-map" initial={{ scale: 0.98 }} animate={{ scale: 1 }} transition={{ duration: 1.3, ease: 'easeOut' }}>
-              <motion.div className="map-pin" animate={{ y: [0, -8, 0] }} transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}>
-                Elm St
+          <div className="hero-visual">
+            <div className="hero-visual__stage">
+              <motion.div className="floating-card card" initial={{ opacity: 0, y: 18 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.9 }}>
+                <div className="floating-card__meta">Elm St · Reported</div>
+                <h4 className="floating-card__title">Pothole near the crosswalk</h4>
               </motion.div>
-              <motion.div className="map-location" style={{ top: '34%', left: '55%' }} animate={{ scale: [1, 1.18, 1] }} transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }} />
-              <motion.div className="map-location" style={{ top: '58%', left: '28%' }} animate={{ scale: [1, 1.15, 1] }} transition={{ duration: 4.4, repeat: Infinity, ease: 'easeInOut' }} />
-              <motion.div className="map-location" style={{ top: '72%', left: '68%' }} animate={{ scale: [1, 1.12, 1] }} transition={{ duration: 4.7, repeat: Infinity, ease: 'easeInOut' }} />
-            </motion.div>
-            <div className="hero-preview-meta">
-              <div>
-                <p>Active reports</p>
-                <strong><AnimatedNumber value={46} /></strong>
-              </div>
-              <div>
-                <p>Resolved this week</p>
-                <strong><AnimatedNumber value={12} /></strong>
+
+              <motion.div className="floating-marker" animate={{ y: [0, -8, 0] }} transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }} aria-hidden />
+
+              <motion.div className="visual-stats" initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} transition={{ delay: 0.6 }}>
+                <div>
+                  <p>Active reports</p>
+                  <strong><AnimatedNumber value={46} /></strong>
+                </div>
+                <div>
+                  <p>Resolved this week</p>
+                  <strong><AnimatedNumber value={12} /></strong>
+                </div>
+              </motion.div>
+
+              {/* 3D hero canvas */}
+              <div className="hero-canvas-wrap" style={{ width: 360, height: 320 }}>
+                <Suspense fallback={null}>
+                  <HeroCanvas />
+                </Suspense>
               </div>
             </div>
-          </motion.div>
+          </div>
         </div>
       </div>
 
